@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/app/page.tsx
 import cvData from '../data/cv.json';
 
