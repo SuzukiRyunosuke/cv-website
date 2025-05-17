@@ -1,103 +1,217 @@
-import Image from "next/image";
+// src/app/page.tsx
+import cvData from '../data/cv.json';
+
+interface Position {
+  from: string;
+  to: string | null;
+  title: string;
+  institution: string;
+}
+interface LinkSet {
+  orcid: string;
+  researchgate: string;
+  lab_introduction: string;
+}
+interface Profile {
+  name: string;
+  name_roman: string;
+  affiliation: string;
+  positions: Position[];
+  contact: { email: string; phone: string };
+  research_fields: string[];
+  links: LinkSet;
+}
+
+interface CVData {
+  profile: Profile;
+  education: { at: string; degree: string; institution: string }[];
+  grants_and_fellowships: { title: string; from?: string; to?: string; at?: string }[];
+  publications: {
+    authors: string[];
+    title: string;
+    venue: string;
+    identifier?: string;
+    volume?: string;
+    page?: string;
+    year: number;
+    doi?: string;
+  }[];
+  international_conference_presentations: any[];
+  domestic_invited_lectures: any[];
+  domestic_presentations: any[];
+  other_activities: any[];
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const {
+    profile,
+    education,
+    grants_and_fellowships,
+    publications,
+    international_conference_presentations,
+    domestic_invited_lectures,
+    domestic_presentations,
+    other_activities,
+  } = cvData as CVData;
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+  return (
+    <main className="container mx-auto p-6 prose">
+      {/* Profile */}
+      <section>
+        <h1 className="text-4xl font-bold">{profile.name}</h1>
+        <p>{profile.affiliation}</p>
+        <ul>
+          {profile.positions.map((pos, i) => (
+            <li key={i}>
+              {pos.from} – {pos.to ?? '現在'}: {pos.title}, {pos.institution}
+            </li>
+          ))}
+        </ul>
+        <p>
+          Email:{' '}
+          <a href={`mailto:${profile.contact.email}`}>{profile.contact.email}</a>
+        </p>
+        <p>Phone: {profile.contact.phone}</p>
+        <p>Research: {profile.research_fields.join(', ')}</p>
+        <p>
+          Links:{' '}
           <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href={profile.links.orcid}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
+            ORCID
           </a>
+          ,{' '}
           <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href={profile.links.researchgate}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Read our docs
+            ResearchGate
           </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          ,{' '}
+          <a
+            href={profile.links.lab_introduction}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Lab Intro
+          </a>
+        </p>
+      </section>
+
+      {/* Education */}
+      <section>
+        <h2>Education</h2>
+        <ul>
+          {education.map((edu, i) => (
+            <li key={i}>
+              {edu.at}: {edu.institution} ({edu.degree})
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Grants & Fellowships */}
+      <section>
+        <h2>Grants & Fellowships</h2>
+        <ul>
+          {grants_and_fellowships.map((g, i) => (
+            <li key={i}>
+              {g.at ?? `${g.from} – ${g.to}`}: {g.title}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Publications */}
+      <section>
+        <h2>Publications</h2>
+        <ol>
+          {publications.map((pub, i) => (
+            <li key={i}>
+              {pub.authors.join(', ')}. <em>{pub.title}</em>. {pub.venue}
+              {pub.identifier ? `, ${pub.identifier}` : ''}
+              {pub.volume ? `, ${pub.volume}` : ''}
+              {pub.page ? `, ${pub.page}` : ''} ({pub.year}).
+              {pub.doi && (
+                <span>
+                  {' '}
+                  DOI:{' '}
+                  <a
+                    href={`https://doi.org/${pub.doi}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {pub.doi}
+                  </a>
+                </span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* International Conferences */}
+      <section>
+        <h2>International Conferences</h2>
+        <ul>
+          {international_conference_presentations.map((conf, i) => (
+            <li key={i}>
+              {conf.at}: {conf.title}, {conf.conference} ({conf.location})
+              {conf.status ? ` – ${conf.status}` : ''}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Domestic Invited Lectures */}
+      <section>
+        <h2>Domestic Invited Lectures</h2>
+        <ul>
+          {domestic_invited_lectures.map((lec, i) => (
+            <li key={i}>
+              {lec.at}: {lec.title}, {lec.event} ({lec.location})
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Domestic Presentations */}
+      <section>
+        <h2>Domestic Presentations</h2>
+        <ul>
+          {domestic_presentations.map((pres, i) => (
+            <li key={i}>
+              {pres.at}: {pres.title}, {pres.event} ({pres.location})
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Other Activities */}
+      <section>
+        <h2>Other Activities</h2>
+        {other_activities.map((act, i) => (
+          <div key={i} className="mb-4">
+            <h3>{act.category}</h3>
+            {'details' in act ? (
+              <ul>
+                {act.details.map((d: any, j: number) => (
+                  <li key={j}>
+                    {d.from} – {d.to ?? '現在'}: {d.partner} ({d.country})
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>
+                {act.at}: {act.event ?? act.conference}
+              </p>
+            )}
+          </div>
+        ))}
+      </section>
+    </main>
   );
 }
