@@ -16,7 +16,7 @@ const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
   output: 'export',
-  distDir: 'docs',
+  //distDir: 'docs',
 
   // 本番環境時 (GitHub Pages のとき) のみ
   basePath: isProd ? '/cv-website' : '',
