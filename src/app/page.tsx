@@ -210,7 +210,7 @@ export default function Home() {
                 return (
                   <span key={idx}>
                     {isSuzuki ? (
-                      <span style={{ textDecoration: "underline text-blue-600" }}>{name}</span>
+                      <span style={{ textDecoration: "underline" }}>{name}</span>
                     ) : (
                       <span>{name}</span>
                     )}
