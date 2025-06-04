@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
   // 本番環境時 (GitHub Pages のとき) のみ
   basePath: isProd ? '/cv-website' : '',
   // ここで「/cv-website/_next」をプレフィックスにする
-  assetPrefix: isProd ? '/cv-website/docs' : '',
+  assetPrefix: isProd ? '/cv-website' : '',
 };
 
 export default nextConfig;
