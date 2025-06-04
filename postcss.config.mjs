@@ -1,15 +1,12 @@
-// postcss.config.mjs
-
-import tailwindcss from "tailwindcss";
+// postcss.config.mjs（修正後）
+import tailwind from "@tailwindcss/postcss";
 import autoprefixer from "autoprefixer";
 
-// オブジェクトを config という変数に代入
 const config = {
   plugins: [
-    tailwindcss(),
-    autoprefixer(),
+    tailwind(),       // @tailwindcss/postcss を呼び出す
+    autoprefixer(),   // autoprefixer も呼び出す
   ],
 };
 
-// 変数を export default する
 export default config;
