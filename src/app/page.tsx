@@ -69,7 +69,7 @@ export default function Home() {
            z-20
          "
        >
-         <ul className="flex space-x-4 px-6 py-3">
+         <ol className="flex space-x-4 px-6 py-3">
            <li>
              <Link
                to="sectionProfile"
@@ -174,7 +174,7 @@ export default function Home() {
                Other Activities
              </Link>
            </li>
-         </ul>
+         </ol>
        </nav>
 
        {/** ─── 固定ヘッダーの高さぶんだけ余白を確保 ─── **/}
@@ -188,13 +188,13 @@ export default function Home() {
         <section>
           <h1 className="text-4xl font-bold">{profile.name}</h1>
           <p>{profile.affiliation}</p>
-          <ul>
+          <ol>
             {profile.positions.map((pos, i) => (
               <li key={i}>
                 {pos.from} - {pos.to ?? '現在'}: {pos.title}, {pos.institution}
               </li>
             ))}
-          </ul>
+          </ol>
           <p>
             Email:{' '}
             <a href={`mailto:${profile.contact.email}`}>{profile.contact.email}</a>
@@ -232,26 +232,26 @@ export default function Home() {
          <Element name="sectionEducation">
         <section>
           <h2>経歴</h2>
-          <ul>
+          <ol>
             {education.map((edu, i) => (
               <li key={i}>
                 {edu.at}: {edu.institution} ({edu.degree})
               </li>
             ))}
-          </ul>
+          </ol>
         </section>
         </Element>
         {/** === Grants & Fellowships セクション === **/}
          <Element name="sectionGrants">
         <section>
           <h2>Grants & Fellowships</h2>
-          <ul>
+          <ol>
             {grants_and_fellowships.map((g, i) => (
               <li key={i}>
                 {g.at ?? `${g.from} - ${g.to}`}: {g.title}
               </li>
             ))}
-          </ul>
+          </ol>
         </section>
         </Element>
 
@@ -289,14 +289,14 @@ export default function Home() {
          <Element name="sectionIntlConfs">
          <section>
           <h2>国際学会</h2>
-          <ul>
+          <ol>
             {international_conference_presentations.map((conf, i) => (
               <li key={i}>
                 {conf.at}: {conf.authors.join(', ')}, {conf.title}, <em>{conf.conference}</em> ({conf.location})
                 {conf.status ? ` - ${conf.status}` : ''}
               </li>
             ))}
-          </ul>
+          </ol>
         </section>
         </Element>
 
@@ -304,7 +304,7 @@ export default function Home() {
          <Element name="sectionInvited">
         <section>
           <h2>招待講演（国内）</h2>
-          <ul>
+          <ol>
             {domestic_invited_lectures.map((lec, i) => (
               <li key={i}>
                 {lec.at}：
@@ -324,7 +324,7 @@ export default function Home() {
                 ，{lec.title}， {lec.event} ({lec.location})
               </li>
             ))}
-          </ul>
+          </ol>
         </section>
         </Element>
 
@@ -332,7 +332,7 @@ export default function Home() {
          <Element name="sectionDomPres">
         <section>
           <h2>学会等国内での発表</h2>
-          <ul>
+          <ol>
             {domestic_presentations.map((pres, i) => (
               <li key={i}>
                 {pres.at}：
@@ -353,7 +353,7 @@ export default function Home() {
                 ，{pres.title}，{pres.event} ({pres.location})
               </li>
             ))}
-          </ul>
+          </ol>
         </section>
         </Element>
 
@@ -365,13 +365,13 @@ export default function Home() {
             <div key={i} className="mb-4">
               <h3>{act.category}</h3>
               {'details' in act ? (
-                <ul>
+                <ol>
                   {act.details.map((d: any, j: number) => (
                     <li key={j}>
                       {d.from} - {d.to ?? '現在'}：{d.partner} ({d.country})
                     </li>
                   ))}
-                </ul>
+                </ol>
               ) : (
                 <p>
                   {act.at}：{act.event ?? act.conference}
