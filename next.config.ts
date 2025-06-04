@@ -9,22 +9,19 @@
 // };
 
 // export default nextConfig;
-
 // next.config.ts
 import type { NextConfig } from 'next';
 
 const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig: NextConfig = {
-  // 静的 HTML エクスポートモード
   output: 'export',
-  // ビルド成果物を docs/ フォルダに出力
   distDir: 'docs',
 
-  // 本番環境（GitHub Pages）では "/cv-website" を basePath に指定
+  // 本番環境時 (GitHub Pages のとき) のみ
   basePath: isProd ? '/cv-website' : '',
-  // 本番環境では JS/CSS/画像などに "/cv-website/" をプレフィックス
-  assetPrefix: isProd ? '/cv-website/' : '',
+  // ここで「/cv-website/_next」をプレフィックスにする
+  assetPrefix: isProd ? '/cv-website/_next' : '',
 };
 
 export default nextConfig;
