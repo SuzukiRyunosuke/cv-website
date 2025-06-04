@@ -4,8 +4,8 @@
 "use client";
 
 import cvData from '../data/cv.json';
-import Sidebar from './sidebar';
-import React, { useRef } from "react"; 
+import React from "react"; 
+import { Link, Element } from 'react-scroll';
 
 interface Position {
   from: string;
@@ -60,220 +60,328 @@ export default function Home() {
     other_activities,
   } = cvData as CVData;
 
-  const profileRef = useRef<HTMLElement | null>(null);
-  const educationRef = useRef<HTMLElement | null>(null);
-  const grantsRef = useRef<HTMLElement | null>(null);
-  const publicationsRef = useRef<HTMLElement | null>(null);
-  const intlConfsRef = useRef<HTMLElement | null>(null);
-  const invitedLecturesRef = useRef<HTMLElement | null>(null);
-  const domPresentationsRef = useRef<HTMLElement | null>(null);
-  const otherActivitiesRef = useRef<HTMLElement | null>(null);
-
-  const scrollTo = (ref: React.RefObject<HTMLElement | null>) => {
-    if (ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
-    <div className="flex">
-      <Sidebar
-        onScrollToProfile={() => scrollTo(profileRef)}
-        onScrollToEducation={() => scrollTo(educationRef)}
-        onScrollToGrants={() => scrollTo(grantsRef)}
-        onScrollToPublications={() => scrollTo(publicationsRef)}
-        onScrollToIntlConfs={() => scrollTo(intlConfsRef)}
-        onScrollToInvitedLectures={() => scrollTo(invitedLecturesRef)}
-        onScrollToDomPresentations={() => scrollTo(domPresentationsRef)}
-        onScrollToOtherActivities={() => scrollTo(otherActivitiesRef)}
-      />
+     <div>
+       {/** ──────────────── ① ナビゲーション部分 ──────────────── **/}
+       <nav
+         className="
+           fixed top-0 left-0 w-full bg-white shadow 
+           z-20
+         "
+       >
+         <ul className="flex space-x-4 px-6 py-3">
+           <li>
+             <Link
+               to="sectionProfile"
+               spy={true}
+               smooth={true}
+               offset={-64}
+               duration={400}
+               activeClass="active"
+               className="cursor-pointer hover:underline"
+             >
+               Profile
+             </Link>
+           </li>
+           <li>
+             <Link
+               to="sectionEducation"
+               spy={true}
+               smooth={true}
+               offset={-64}
+               duration={400}
+               activeClass="active"
+               className="cursor-pointer hover:underline"
+             >
+               経歴
+             </Link>
+           </li>
+           <li>
+             <Link
+               to="sectionGrants"
+               spy={true}
+               smooth={true}
+               offset={-64}
+               duration={400}
+               activeClass="active"
+               className="cursor-pointer hover:underline"
+             >
+               Grants & Fellowships
+             </Link>
+           </li>
+           <li>
+             <Link
+               to="sectionPublications"
+               spy={true}
+               smooth={true}
+               offset={-64}
+               duration={400}
+               activeClass="active"
+               className="cursor-pointer hover:underline"
+             >
+               論文
+             </Link>
+           </li>
+           <li>
+             <Link
+               to="sectionIntlConfs"
+               spy={true}
+               smooth={true}
+               offset={-64}
+               duration={400}
+               activeClass="active"
+               className="cursor-pointer hover:underline"
+             >
+               国際学会
+             </Link>
+           </li>
+           <li>
+             <Link
+               to="sectionInvited"
+               spy={true}
+               smooth={true}
+               offset={-64}
+               duration={400}
+               activeClass="active"
+               className="cursor-pointer hover:underline"
+             >
+               招待講演（国内）
+             </Link>
+           </li>
+           <li>
+             <Link
+               to="sectionDomPres"
+               spy={true}
+               smooth={true}
+               offset={-64}
+               duration={400}
+               activeClass="active"
+               className="cursor-pointer hover:underline"
+             >
+               国内発表
+             </Link>
+           </li>
+           <li>
+             <Link
+               to="sectionOther"
+               spy={true}
+               smooth={true}
+               offset={-64}
+               duration={400}
+               activeClass="active"
+               className="cursor-pointer hover:underline"
+             >
+               Other Activities
+             </Link>
+           </li>
+         </ul>
+       </nav>
 
-    <main className="container mx-auto p-6 prose ml-48">
-      {/* Profile */}
-      <section ref={profileRef}>
-        <h1 className="text-4xl font-bold">{profile.name}</h1>
-        <p>{profile.affiliation}</p>
-        <ul>
-          {profile.positions.map((pos, i) => (
-            <li key={i}>
-              {pos.from} - {pos.to ?? '現在'}: {pos.title}, {pos.institution}
-            </li>
-          ))}
-        </ul>
-        <p>
-          Email:{' '}
-          <a href={`mailto:${profile.contact.email}`}>{profile.contact.email}</a>
-        </p>
-        <p>Research: {profile.research_fields.join(', ')}</p>
-        <p>
-          Links:{' '}
-          <a
-            href={profile.links.orcid}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            ORCID
-          </a>
-          ,{' '}
-          <a
-            href={profile.links.researchgate}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            ResearchGate
-          </a>
-          ,{' '}
-          <a
-            href={profile.links.lab_introduction}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Lab
-          </a>
-        </p>
-      </section>
+       {/** ─── 固定ヘッダーの高さぶんだけ余白を確保 ─── **/}
+       <div style={{ height: "64px" }} />
 
-      {/* Education */}
-      <section ref={educationRef} className="mt-12">
-        <h2>経歴</h2>
-        <ul>
-          {education.map((edu, i) => (
-            <li key={i}>
-              {edu.at}: {edu.institution} ({edu.degree})
-            </li>
-          ))}
-        </ul>
-      </section>
+       {/** ──────────────── メインコンテンツ ──────────────── **/}
+      <main className="container mx-auto p-6">
+        {/** 各セクションを <Element name="xxx"> でラップする **/}
+        {/** === Profile セクション === **/}
+        <Element name="sectionProfile">
+        <section>
+          <h1 className="text-4xl font-bold">{profile.name}</h1>
+          <p>{profile.affiliation}</p>
+          <ul>
+            {profile.positions.map((pos, i) => (
+              <li key={i}>
+                {pos.from} - {pos.to ?? '現在'}: {pos.title}, {pos.institution}
+              </li>
+            ))}
+          </ul>
+          <p>
+            Email:{' '}
+            <a href={`mailto:${profile.contact.email}`}>{profile.contact.email}</a>
+          </p>
+          <p>Research: {profile.research_fields.join(', ')}</p>
+          <p>
+            Links:{' '}
+            <a
+              href={profile.links.orcid}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ORCID
+            </a>
+            ,{' '}
+            <a
+              href={profile.links.researchgate}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              ResearchGate
+            </a>
+            ,{' '}
+            <a
+              href={profile.links.lab_introduction}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Lab
+            </a>
+          </p>
+        </section>
+        </Element>
+         {/** === Education セクション === **/}
+         <Element name="sectionEducation">
+        <section>
+          <h2>経歴</h2>
+          <ul>
+            {education.map((edu, i) => (
+              <li key={i}>
+                {edu.at}: {edu.institution} ({edu.degree})
+              </li>
+            ))}
+          </ul>
+        </section>
+        </Element>
+        {/** === Grants & Fellowships セクション === **/}
+         <Element name="sectionGrants">
+        <section>
+          <h2>Grants & Fellowships</h2>
+          <ul>
+            {grants_and_fellowships.map((g, i) => (
+              <li key={i}>
+                {g.at ?? `${g.from} - ${g.to}`}: {g.title}
+              </li>
+            ))}
+          </ul>
+        </section>
+        </Element>
 
-      {/* 助成金 */}
-      <section>
-        <h2>Grants & Fellowships</h2>
-        <ul>
-          {grants_and_fellowships.map((g, i) => (
-            <li key={i}>
-              {g.at ?? `${g.from} - ${g.to}`}: {g.title}
-            </li>
-          ))}
-        </ul>
-      </section>
+        {/** === Publications セクション === **/}
+         <Element name="sectionPublications">
+          <section>
+          <h2>論文</h2>
+          <ol>
+            {publications.map((pub, i) => (
+              <li key={i}>
+                {pub.authors.join(', ')}, &quot;<em>{pub.title}</em>,&quot; <em>{pub.venue}</em>
+                {pub.identifier ? `, ${pub.identifier}` : ''}
+                {pub.volume ? `, ${pub.volume}` : ''}
+                {pub.page ? `, ${pub.page}` : ''} ({pub.year}).
+                {pub.doi && (
+                  <span>
+                    {' '}
+                    DOI:{' '}
+                    <a
+                      href={`https://doi.org/${pub.doi}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {pub.doi}
+                    </a>
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
+        </Element>
 
-      {/* Publications */}
-      <section ref={publicationsRef} className="mt-12">
-        <h2>論文</h2>
-        <ol>
-          {publications.map((pub, i) => (
-            <li key={i}>
-              {pub.authors.join(', ')}, &quot;<em>{pub.title}</em>,&quot; <em>{pub.venue}</em>
-              {pub.identifier ? `, ${pub.identifier}` : ''}
-              {pub.volume ? `, ${pub.volume}` : ''}
-              {pub.page ? `, ${pub.page}` : ''} ({pub.year}).
-              {pub.doi && (
-                <span>
-                  {' '}
-                  DOI:{' '}
-                  <a
-                    href={`https://doi.org/${pub.doi}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {pub.doi}
-                  </a>
-                </span>
+        {/** === International Conference Presentations セクション === **/}
+         <Element name="sectionIntlConfs">
+         <section>
+          <h2>国際学会</h2>
+          <ul>
+            {international_conference_presentations.map((conf, i) => (
+              <li key={i}>
+                {conf.at}: {conf.authors.join(', ')}, {conf.title}, <em>{conf.conference}</em> ({conf.location})
+                {conf.status ? ` - ${conf.status}` : ''}
+              </li>
+            ))}
+          </ul>
+        </section>
+        </Element>
+
+        {/** === Domestic Invited Lectures セクション === **/}
+         <Element name="sectionInvited">
+        <section>
+          <h2>招待講演（国内）</h2>
+          <ul>
+            {domestic_invited_lectures.map((lec, i) => (
+              <li key={i}>
+                {lec.at}：
+                {lec.authors.map((name: string, idx: number) => {
+                  const isSuzuki = name === "鈴木龍之介";
+                  return (
+                    <span key={idx}>
+                      {isSuzuki ? (
+                        <span style={{ textDecoration: "underline" }}>{name}</span>
+                      ) : (
+                        <span>{name}</span>
+                      )}
+                      {idx < lec.authors.length - 1 && "，"}
+                    </span>
+                  );
+                })}
+                ，{lec.title}， {lec.event} ({lec.location})
+              </li>
+            ))}
+          </ul>
+        </section>
+        </Element>
+
+        {/** === Domestic Presentations セクション === **/}
+         <Element name="sectionDomPres">
+        <section>
+          <h2>学会等国内での発表</h2>
+          <ul>
+            {domestic_presentations.map((pres, i) => (
+              <li key={i}>
+                {pres.at}：
+                {pres.authors.map((name: string, idx: number) => {
+                  const isSuzuki = name === "鈴木龍之介";
+
+                  return (
+                    <span key={idx}>
+                      {isSuzuki ? (
+                        <span style={{ textDecoration: "underline" }}>{name}</span>
+                      ) : (
+                        <span>{name}</span>
+                      )}
+                      {idx < pres.authors.length - 1 && "，"}
+                    </span>
+                  );
+                })}
+                ，{pres.title}，{pres.event} ({pres.location})
+              </li>
+            ))}
+          </ul>
+        </section>
+        </Element>
+
+        {/** === Other Activities セクション === **/}
+        <Element name="sectionOther">
+        <section>
+          <h2>Other Activities</h2>
+          {other_activities.map((act, i) => (
+            <div key={i} className="mb-4">
+              <h3>{act.category}</h3>
+              {'details' in act ? (
+                <ul>
+                  {act.details.map((d: any, j: number) => (
+                    <li key={j}>
+                      {d.from} - {d.to ?? '現在'}：{d.partner} ({d.country})
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>
+                  {act.at}：{act.event ?? act.conference}
+                </p>
               )}
-            </li>
+            </div>
           ))}
-        </ol>
-      </section>
-
-      {/* International Conferences */}
-      <section ref={intlConfsRef} className="mt-12">
-        <h2>国際学会</h2>
-        <ul>
-          {international_conference_presentations.map((conf, i) => (
-            <li key={i}>
-              {conf.at}: {conf.authors.join(', ')}, {conf.title}, <em>{conf.conference}</em> ({conf.location})
-              {conf.status ? ` - ${conf.status}` : ''}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Domestic Invited Lectures */}
-      <section ref={invitedLecturesRef} className="mt-12">
-        <h2>招待講演（国内）</h2>
-        <ul>
-          {domestic_invited_lectures.map((lec, i) => (
-            <li key={i}>
-              {lec.at}：
-              {lec.authors.map((name: string, idx: number) => {
-                const isSuzuki = name === "鈴木龍之介";
-                return (
-                  <span key={idx}>
-                    {isSuzuki ? (
-                      <span style={{ textDecoration: "underline" }}>{name}</span>
-                    ) : (
-                      <span>{name}</span>
-                    )}
-                    {idx < lec.authors.length - 1 && "，"}
-                  </span>
-                );
-              })}
-              ，{lec.title}， {lec.event} ({lec.location})
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Domestic Presentations */}
-      <section ref={domPresentationsRef} className="mt-12">
-        <h2>学会等国内での発表</h2>
-        <ul>
-          {domestic_presentations.map((pres, i) => (
-            <li key={i}>
-              {pres.at}：
-              {pres.authors.map((name: string, idx: number) => {
-                const isSuzuki = name === "鈴木龍之介";
-
-                return (
-                  <span key={idx}>
-                    {isSuzuki ? (
-                      <span style={{ textDecoration: "underline" }}>{name}</span>
-                    ) : (
-                      <span>{name}</span>
-                    )}
-                    {idx < pres.authors.length - 1 && "，"}
-                  </span>
-                );
-              })}
-              ，{pres.title}，{pres.event} ({pres.location})
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* Other Activities */}
-      <section ref={otherActivitiesRef} className="mt-12">
-        <h2>Other Activities</h2>
-        {other_activities.map((act, i) => (
-          <div key={i} className="mb-4">
-            <h3>{act.category}</h3>
-            {'details' in act ? (
-              <ul>
-                {act.details.map((d: any, j: number) => (
-                  <li key={j}>
-                    {d.from} - {d.to ?? '現在'}：{d.partner} ({d.country})
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>
-                {act.at}：{act.event ?? act.conference}
-              </p>
-            )}
-          </div>
-        ))}
-      </section>
-    </main>
-  </div>
+        </section>
+        </Element>
+      </main>
+    </div>
   );
 }
