@@ -1,10 +1,12 @@
 @import "tailwindcss";
 
+/* ①：デフォルトの root にはダーク用の配色を定義 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
+/* ②：フォント用の変数（next/font/google で定義した --font-geist-sans, --font-geist-mono）を受け取る */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -12,15 +14,25 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ③：ライト／ダークを切り替えたい場合に備えて .dark クラスも定義できるが、今回は常にダークなので不要 */
+html.dark {
+  /* もし将来的にライト⇔ダークのトグルを残したいなら、この中にダーク用配色を再定義する */
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
+/* ④：body やその他の要素に対して実際に CSS 変数を適用 */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  /* もし等幅フォントを使いたい場面があれば */
+}
+code, pre, .mono {
+  font-family: var(--font-geist-mono), Menlo, Monaco, monospace;
+}
+
+/* ⑤：リンクやその他コンポーネントの色も、必要に応じて変数を参照して指定する */
+a {
+  color: #90caf9; /* ダークモードのリンク色例 */
 }

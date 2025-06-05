@@ -5,7 +5,7 @@
 
 import cvData from '../data/cv.json';
 import React from "react"; 
-import { Link, Element } from 'react-scroll';
+//import { Link, Element } from 'react-scroll';
 
 interface Position {
   from: string;
@@ -61,140 +61,18 @@ export default function Home() {
   } = cvData as CVData;
 
   return (
-     <div>
-       {/** ──────────────── ① ナビゲーション部分 ──────────────── **/}
-       <nav
-         className="
-           fixed top-0 left-0 w-full bg-white shadow 
-           z-20
-         "
-       >
-         <ol className="flex space-x-4 px-6 py-3">
-           <li>
-             <Link
-               to="sectionProfile"
-               spy={true}
-               smooth={true}
-               offset={-64}
-               duration={400}
-               activeClass="active"
-               className="cursor-pointer hover:underline"
-             >
-               Profile
-             </Link>
-           </li>
-           <li>
-             <Link
-               to="sectionEducation"
-               spy={true}
-               smooth={true}
-               offset={-64}
-               duration={400}
-               activeClass="active"
-               className="cursor-pointer hover:underline"
-             >
-               経歴
-             </Link>
-           </li>
-           <li>
-             <Link
-               to="sectionGrants"
-               spy={true}
-               smooth={true}
-               offset={-64}
-               duration={400}
-               activeClass="active"
-               className="cursor-pointer hover:underline"
-             >
-               Grants & Fellowships
-             </Link>
-           </li>
-           <li>
-             <Link
-               to="sectionPublications"
-               spy={true}
-               smooth={true}
-               offset={-64}
-               duration={400}
-               activeClass="active"
-               className="cursor-pointer hover:underline"
-             >
-               論文
-             </Link>
-           </li>
-           <li>
-             <Link
-               to="sectionIntlConfs"
-               spy={true}
-               smooth={true}
-               offset={-64}
-               duration={400}
-               activeClass="active"
-               className="cursor-pointer hover:underline"
-             >
-               国際学会
-             </Link>
-           </li>
-           <li>
-             <Link
-               to="sectionInvited"
-               spy={true}
-               smooth={true}
-               offset={-64}
-               duration={400}
-               activeClass="active"
-               className="cursor-pointer hover:underline"
-             >
-               招待講演（国内）
-             </Link>
-           </li>
-           <li>
-             <Link
-               to="sectionDomPres"
-               spy={true}
-               smooth={true}
-               offset={-64}
-               duration={400}
-               activeClass="active"
-               className="cursor-pointer hover:underline"
-             >
-               国内発表
-             </Link>
-           </li>
-           <li>
-             <Link
-               to="sectionOther"
-               spy={true}
-               smooth={true}
-               offset={-64}
-               duration={400}
-               activeClass="active"
-               className="cursor-pointer hover:underline"
-             >
-               Other Activities
-             </Link>
-           </li>
-         </ol>
-       </nav>
-
-       {/** ─── 固定ヘッダーの高さぶんだけ余白を確保 ─── **/}
-       <div style={{ height: "64px" }} />
-
-       {/** ──────────────── メインコンテンツ ──────────────── **/}
       <main className="container mx-auto p-6">
-        {/** 各セクションを <Element name="xxx"> でラップする **/}
+        {/** 各セクションを <section id="xxx"> でラップする **/}
         {/** === Profile セクション === **/}
-        <Element name="sectionProfile">
+        <section id="sectionProfile">
         <section>
-          <h1 className="text-4xl font-bold">{profile.name}</h1>
+          <h1 className="text-16xl font-bold">{profile.name_roman}/{profile.name}</h1>
           <p>{profile.affiliation}</p>
-          <ol>
             {profile.positions.map((pos, i) => (
               <li key={i}>
                 {pos.from} - {pos.to ?? '現在'}: {pos.title}, {pos.institution}
               </li>
             ))}
-          </ol>
           <p>
             Email:{' '}
             <a href={`mailto:${profile.contact.email}`}>{profile.contact.email}</a>
@@ -227,22 +105,20 @@ export default function Home() {
             </a>
           </p>
         </section>
-        </Element>
+        </section>
          {/** === Education セクション === **/}
-         <Element name="sectionEducation">
+         <section id="sectionEducation">
         <section>
           <h2>経歴</h2>
-          <ol>
             {education.map((edu, i) => (
               <li key={i}>
                 {edu.at}: {edu.institution} ({edu.degree})
               </li>
             ))}
-          </ol>
         </section>
-        </Element>
+        </section>
         {/** === Grants & Fellowships セクション === **/}
-         <Element name="sectionGrants">
+         <section id="sectionGrants">
         <section>
           <h2>Grants & Fellowships</h2>
           <ol>
@@ -253,10 +129,10 @@ export default function Home() {
             ))}
           </ol>
         </section>
-        </Element>
+        </section>
 
         {/** === Publications セクション === **/}
-         <Element name="sectionPublications">
+         <section id="sectionPublications">
           <section>
           <h2>論文</h2>
           <ol>
@@ -283,10 +159,10 @@ export default function Home() {
             ))}
           </ol>
         </section>
-        </Element>
+        </section>
 
         {/** === International Conference Presentations セクション === **/}
-         <Element name="sectionIntlConfs">
+         <section id="sectionIntlConfs">
          <section>
           <h2>国際学会</h2>
           <ol>
@@ -298,10 +174,10 @@ export default function Home() {
             ))}
           </ol>
         </section>
-        </Element>
+        </section>
 
         {/** === Domestic Invited Lectures セクション === **/}
-         <Element name="sectionInvited">
+         <section id="sectionInvited">
         <section>
           <h2>招待講演（国内）</h2>
           <ol>
@@ -326,10 +202,10 @@ export default function Home() {
             ))}
           </ol>
         </section>
-        </Element>
+        </section>
 
         {/** === Domestic Presentations セクション === **/}
-         <Element name="sectionDomPres">
+         <section id="sectionDomPres">
         <section>
           <h2>学会等国内での発表</h2>
           <ol>
@@ -355,10 +231,10 @@ export default function Home() {
             ))}
           </ol>
         </section>
-        </Element>
+        </section>
 
         {/** === Other Activities セクション === **/}
-        <Element name="sectionOther">
+        <section id="sectionOther">
         <section>
           <h2>Other Activities</h2>
           {other_activities.map((act, i) => (
@@ -373,15 +249,139 @@ export default function Home() {
                   ))}
                 </ol>
               ) : (
-                <p>
-                  {act.at}：{act.event ?? act.conference}
-                </p>
+                <ol>
+                  {act.details.map((d: any, j: number) => (
+                    <li key={j}>
+                      {act.at}：{act.event ?? act.conference}
+                    </li>
+                  ))}
+                </ol>
               )}
             </div>
           ))}
         </section>
-        </Element>
+        </section>
       </main>
-    </div>
   );
 }
+
+
+  //      {/** ──────────────── ① ナビゲーション部分 ──────────────── **/}
+  //      <nav
+  //        className="
+  //          fixed top-0 left-0 w-full bg-white shadow 
+  //          z-20
+  //        "
+  //      >
+  //        <ol>
+  //          <li>
+  //            <Link
+  //              to="sectionProfile"
+  //              spy={true}
+  //              smooth={true}
+  //              offset={-64}
+  //              duration={400}
+  //              activeClass="active"
+  //              className="cursor-pointer hover:underline"
+  //            >
+  //              Profile
+  //            </Link>
+  //          </li>
+  //          <li>
+  //            <Link
+  //              to="sectionEducation"
+  //              spy={true}
+  //              smooth={true}
+  //              offset={-64}
+  //              duration={400}
+  //              activeClass="active"
+  //              className="cursor-pointer hover:underline"
+  //            >
+  //              経歴
+  //            </Link>
+  //          </li>
+  //          <li>
+  //            <Link
+  //              to="sectionGrants"
+  //              spy={true}
+  //              smooth={true}
+  //              offset={-64}
+  //              duration={400}
+  //              activeClass="active"
+  //              className="cursor-pointer hover:underline"
+  //            >
+  //              Grants & Fellowships
+  //            </Link>
+  //          </li>
+  //          <li>
+  //            <Link
+  //              to="sectionPublications"
+  //              spy={true}
+  //              smooth={true}
+  //              offset={-64}
+  //              duration={400}
+  //              activeClass="active"
+  //              className="cursor-pointer hover:underline"
+  //            >
+  //              論文
+  //            </Link>
+  //          </li>
+  //          <li>
+  //            <Link
+  //              to="sectionIntlConfs"
+  //              spy={true}
+  //              smooth={true}
+  //              offset={-64}
+  //              duration={400}
+  //              activeClass="active"
+  //              className="cursor-pointer hover:underline"
+  //            >
+  //              国際学会
+  //            </Link>
+  //          </li>
+  //          <li>
+  //            <Link
+  //              to="sectionInvited"
+  //              spy={true}
+  //              smooth={true}
+  //              offset={-64}
+  //              duration={400}
+  //              activeClass="active"
+  //              className="cursor-pointer hover:underline"
+  //            >
+  //              招待講演（国内）
+  //            </Link>
+  //          </li>
+  //          <li>
+  //            <Link
+  //              to="sectionDomPres"
+  //              spy={true}
+  //              smooth={true}
+  //              offset={-64}
+  //              duration={400}
+  //              activeClass="active"
+  //              className="cursor-pointer hover:underline"
+  //            >
+  //              国内発表
+  //            </Link>
+  //          </li>
+  //          <li>
+  //            <Link
+  //              to="sectionOther"
+  //              spy={true}
+  //              smooth={true}
+  //              offset={-64}
+  //              duration={400}
+  //              activeClass="active"
+  //              className="cursor-pointer hover:underline"
+  //            >
+  //              Other Activities
+  //            </Link>
+  //          </li>
+  //        </ol>
+  //      </nav>
+
+  //      {/** ─── 固定ヘッダーの高さぶんだけ余白を確保 ─── **/}
+  //      <div style={{ height: "64px" }} />
+
+       {/** ──────────────── メインコンテンツ ──────────────── **/}
