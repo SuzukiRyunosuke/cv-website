@@ -7,7 +7,7 @@
 }
 
 /* ②：フォント用の変数（next/font/google で定義した --font-geist-sans, --font-geist-mono）を受け取る */
-@theme inline {
+:root {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);

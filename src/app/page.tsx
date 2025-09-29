@@ -31,7 +31,7 @@ interface Profile {
 interface CVData {
   profile: Profile;
   education: { at: string; degree: string; institution: string }[];
-  grants_and_fellowships: { title: string; from?: string; to?: string; at?: string }[];
+  grants_and_fellowships: { title: string; from?: string; to?: string; at?: string; amount: string}[];
   publications: {
     authors: string[];
     title: string;
@@ -66,7 +66,7 @@ export default function Home() {
         {/** === Profile セクション === **/}
         <section id="sectionProfile">
         <section>
-          <h1 className="text-16xl font-bold">{profile.name_roman}/{profile.name}</h1>
+          <h2>Ryunosuke SUZUKI/鈴木龍之介</h2>
           <p>{profile.affiliation}</p>
             {profile.positions.map((pos, i) => (
               <li key={i}>
@@ -124,7 +124,7 @@ export default function Home() {
           <ol>
             {grants_and_fellowships.map((g, i) => (
               <li key={i}>
-                {g.at ?? `${g.from} - ${g.to}`}: {g.title}
+                {g.at ?? `${g.from} - ${g.to}`}: {g.title} ({g.amount})
               </li>
             ))}
           </ol>
@@ -138,7 +138,21 @@ export default function Home() {
           <ol>
             {publications.map((pub, i) => (
               <li key={i}>
-                {pub.authors.join(', ')}, &quot;<em>{pub.title}</em>,&quot; <em>{pub.venue}</em>
+                {pub.authors.map((name: string, idx: number) => {
+                  const isSuzuki = name === "Ryunosuke Suzuki";
+
+                  return (
+                    <span key={idx}>
+                      {isSuzuki ? (
+                        <span style={{ textDecoration: "underline" }}>{name}</span>
+                      ) : (
+                        <span>{name}</span>
+                      )}
+                      {idx < pub.authors.length - 1 && "，"}
+                    </span>
+                  );
+                })}
+                , &quot;{pub.title},&quot; <em>{pub.venue}</em>
                 {pub.identifier ? `, ${pub.identifier}` : ''}
                 {pub.volume ? `, ${pub.volume}` : ''}
                 {pub.page ? `, ${pub.page}` : ''} ({pub.year}).
@@ -168,8 +182,22 @@ export default function Home() {
           <ol>
             {international_conference_presentations.map((conf, i) => (
               <li key={i}>
-                {conf.at}: {conf.authors.join(', ')}, {conf.title}, <em>{conf.conference}</em> ({conf.location})
-                {conf.status ? ` - ${conf.status}` : ''}
+                {conf.at}:{" "}
+                {conf.authors.map((name: string, idx: number) => {
+                  const isSuzuki = name === "Ryunosuke Suzuki";
+
+                  return (
+                    <span key={idx}>
+                      {isSuzuki ? (
+                        <span style={{ textDecoration: "underline" }}>{name}</span>
+                      ) : (
+                        <span>{name}</span>
+                      )}
+                      {idx < conf.authors.length - 1 && "，"}
+                    </span>
+                  );
+                })}
+                , &quot;{conf.title},&quot; <em>{conf.conference}</em> ({conf.location})
               </li>
             ))}
           </ol>
@@ -197,7 +225,7 @@ export default function Home() {
                     </span>
                   );
                 })}
-                ，{lec.title}， {lec.event} ({lec.location})
+                ，&quot;{lec.title}，&quot; {lec.event} ({lec.location})
               </li>
             ))}
           </ol>
@@ -226,7 +254,7 @@ export default function Home() {
                     </span>
                   );
                 })}
-                ，{pres.title}，{pres.event} ({pres.location})
+                ，&quot;{pres.title}，&quot;{pres.event} ({pres.location})
               </li>
             ))}
           </ol>
@@ -242,19 +270,17 @@ export default function Home() {
               <h3>{act.category}</h3>
               {'details' in act ? (
                 <ol>
-                  {act.details.map((d: any, j: number) => (
-                    <li key={j}>
+                  {act.details.map((d: any) => (
+                    <li key={i}>
                       {d.from} - {d.to ?? '現在'}：{d.partner} ({d.country})
                     </li>
                   ))}
                 </ol>
               ) : (
                 <ol>
-                  {act.details.map((d: any, j: number) => (
-                    <li key={j}>
+                    <li key={i}>
                       {act.at}：{act.event ?? act.conference}
                     </li>
-                  ))}
                 </ol>
               )}
             </div>
