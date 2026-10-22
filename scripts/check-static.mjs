@@ -26,17 +26,34 @@ for (const file of htmlFiles(root)) {
     assets += 1;
   }
 }
-const index = readFileSync(path.join(root, "index.html"), "utf8");
-const ids = [...index.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
-assert.equal(new Set(ids).size, ids.length, "Duplicate HTML IDs.");
-for (const [, id] of index.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.includes(id), `Broken section link: #${id}`);
-assert.equal((index.match(/<h1\b/g) ?? []).length, 1, "Expected one main heading.");
-assert.ok(index.includes('<html lang="ja"'), "Expected Japanese document language.");
-assert.ok(!index.includes("Create Next App"), "Starter metadata must not be published.");
 const cv = JSON.parse(readFileSync(new URL("../src/data/cv.json", import.meta.url), "utf8"));
+const english = JSON.parse(readFileSync(new URL("../src/data/en.json", import.meta.url), "utf8"));
 const escape = (text) => text.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("'", "&#x27;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-for (const collection of [cv.publications, cv.international_conference_presentations, cv.domestic_invited_lectures, cv.domestic_presentations, cv.grants_and_fellowships]) {
-  for (const record of collection) assert.ok(index.includes(escape(record.title)), `Missing CV entry: ${record.title}`);
+for (const [language, file] of [["ja", "index.html"], ["en", "en/index.html"]]) {
+  const html = readFileSync(path.join(root, file), "utf8");
+  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((match) => match[1]);
+  assert.equal(new Set(ids).size, ids.length, `${language}: duplicate HTML IDs.`);
+  for (const [, id] of html.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.includes(id), `${language}: broken section link #${id}`);
+  assert.equal((html.match(/<h1\b/g) ?? []).length, 1, `${language}: expected one main heading.`);
+  assert.ok(html.includes(`<html lang="${language}"`), `${language}: incorrect document language.`);
+  for (const locale of ["ja", "en"]) assert.ok(html.includes(`hrefLang="${locale}"`), `${language}: missing alternate language ${locale}.`);
+  for (const collection of [cv.publications, cv.international_conference_presentations, cv.domestic_invited_lectures, cv.domestic_presentations, cv.grants_and_fellowships]) {
+    for (const record of collection) {
+      const title = language === "en" ? english[record.title] ?? record.title : record.title;
+      assert.ok(html.includes(escape(title)), `${language}: missing entry ${title}`);
+    }
+  }
+  assert.ok(html.includes(`mailto:${cv.profile.contact.email}`), `${language}: incorrect contact email.`);
+  for (const obsolete of ["Create Next App", "suzuki.ryunosuke.55s@st.kyoto-u.ac.jp", "博士後期課程 在籍", "採択済", "stroke-dasharray", "class=\"monogram\""]) {
+    assert.ok(!html.includes(obsolete), `${language}: obsolete content: ${obsolete}`);
+  }
+  assert.ok(html.includes(language === "en" ? "Nano Life Science Institute" : "金沢大学 ナノ生命科学研究所"));
 }
-assert.ok(!index.includes(cv.profile.contact.phone), "Do not expose the unused phone field.");
-console.log(`Verified ${assets} local references, section anchors, metadata, and all publication/presentation/grant entries.`);
+// A new Japanese entry must have an English translation before it can ship.
+JSON.stringify(cv, (_key, value) => {
+  if (typeof value === "string" && /[\u3040-\u30ff\u3400-\u9fff]/u.test(value)) {
+    assert.ok(english[value], `Missing English translation: ${value}`);
+  }
+  return value;
+});
+console.log(`Verified ${assets} local references; both languages, section anchors, contact details, translations, and all publication/presentation/grant entries.`);
