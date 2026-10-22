@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "predeploy": "next build && next export",
-    "deploy": "gh-pages -d out"
+    "build": "next build && node scripts/publish-static.mjs && node scripts/check-static.mjs",
+    "lint": "eslint src next.config.ts",
+    "preview": "node scripts/preview.mjs",
+    "check": "node scripts/check-static.mjs"
   },
   "dependencies": {
     "next": "15.3.2",
