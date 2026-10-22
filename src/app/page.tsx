@@ -1,413 +1,132 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// src/app/page.tsx
+import type { ReactNode } from "react";
+import cv from "../data/cv.json";
 
-"use client";
-
-import cvData from '../data/cv.json';
-import React from "react"; 
-//import { Link, Element } from 'react-scroll';
-
-interface Position {
-  from: string;
-  to: string | null;
-  title: string;
-  institution: string;
+function Arrow({ diagonal = false }: { diagonal?: boolean }) {
+  return <span aria-hidden="true">{diagonal ? "↗" : "→"}</span>;
 }
-interface LinkSet {
-  orcid: string;
-  researchgate: string;
-  lab_introduction: string;
+function ExternalLink({ href, children, className = "text-link" }: { href: string; children: ReactNode; className?: string }) {
+  return <a className={className} href={href} target="_blank" rel="noopener noreferrer">{children}<Arrow diagonal /></a>;
 }
-interface Profile {
-  name: string;
-  name_roman: string;
-  affiliation: string;
-  positions: Position[];
-  contact: { email: string };
-  research_fields: string[];
-  links: LinkSet;
+function Authors({ names }: { names: string[] }) {
+  return <p className="authors">{names.map((name, i) => <span key={`${name}-${i}`}>
+    {i > 0 && ", "}{name === "Ryunosuke Suzuki" || name === "鈴木龍之介" ? <strong>{name}</strong> : name}
+  </span>)}</p>;
+}
+function DateLabel({ value }: { value: string }) {
+  return <time dateTime={value}>{value.replaceAll("-", ".")}</time>;
+}
+function SectionHeading({ number, title, subtitle, id }: { number: string; title: string; subtitle: string; id: string }) {
+  return <div className="section-heading"><span className="section-number">{number}</span><div><h2 id={id}>{title}</h2><p>{subtitle}</p></div></div>;
 }
 
-interface CVData {
-  profile: Profile;
-  education: { at: string; degree: string; institution: string }[];
-  grants_and_fellowships: { title: string; from?: string; to?: string; at?: string; amount: string}[];
-  publications: {
-    authors: string[];
-    title: string;
-    venue: string;
-    identifier?: string;
-    volume?: string;
-    page?: string;
-    year: number;
-    doi?: string;
-  }[];
-  international_conference_presentations: any[];
-  domestic_invited_lectures: any[];
-  domestic_presentations: any[];
-  other_activities: any[];
+// A decorative, deterministic lattice inspired by the research topics.
+function ResearchFigure() {
+  function point(u: number, v: number) {
+    const z = 42 * Math.sin(u * 0.85) * Math.cos(v * 0.7) + 10 * u;
+    return `${(210 + 38 * u + 21 * v).toFixed(2)},${(190 + 16 * v - 12 * u - z).toFixed(2)}`;
+  }
+  const lines = Array.from({ length: 19 }, (_, i) => -3 + i / 3);
+  return <figure className="research-figure" aria-label="研究分野：バイオメカニクスと生物物理学">
+    <div className="figure-label"><span>FORM / FORCE / ADAPTATION</span><span>01 — 02</span></div>
+    <svg viewBox="0 0 420 340" fill="none" aria-hidden="true">
+      <circle cx="210" cy="173" r="145" stroke="currentColor" strokeOpacity="0.12" strokeDasharray="2 6" />
+      <g stroke="currentColor" strokeWidth="0.8">
+        {lines.map((n, i) => <polyline key={`u-${i}`} opacity={0.35 + i / 50} points={Array.from({ length: 61 }, (_, j) => point(n, -3 + j / 10)).join(" ")} />)}
+        {lines.map((n, i) => <polyline key={`v-${i}`} opacity={0.35 + i / 50} points={Array.from({ length: 61 }, (_, j) => point(-3 + j / 10, n)).join(" ")} />)}
+      </g>
+      <circle cx="210" cy="190" r="3.5" fill="currentColor" />
+      <path d="M210 190V292H286" stroke="currentColor" strokeOpacity="0.35" strokeDasharray="3 4" />
+    </svg>
+    <figcaption><span>Biomechanics</span><span className="figure-cross">×</span><span>Biophysics</span></figcaption>
+  </figure>;
+}
+
+type Presentation = {
+  at: string; authors: string[]; title: string; location: string;
+  conference?: string; event?: string; presentation_type?: string;
+  paper_number?: string; session?: string; status?: string;
+};
+function PresentationList({ items }: { items: Presentation[] }) {
+  return <ol className="record-list presentation-list">{items.map((item) => <li key={`${item.at}-${item.title}`}>
+    <div className="record-date"><DateLabel value={item.at} />{item.presentation_type && <span className="record-type">{item.presentation_type}</span>}</div>
+    <div className="record-body"><h4>{item.title}</h4><Authors names={item.authors} />
+      <p className="venue">{item.conference ?? item.event}</p>
+      <p className="record-note">{[item.location, item.session, item.paper_number && `No. ${item.paper_number}`, item.status].filter(Boolean).join(" · ")}</p>
+    </div>
+  </li>)}</ol>;
 }
 
 export default function Home() {
-  const {
-    profile,
-    education,
-    grants_and_fellowships,
-    publications,
-    international_conference_presentations,
-    domestic_invited_lectures,
-    domestic_presentations,
-    other_activities,
-  } = cvData as CVData;
-
-  return (
-      <main className="container mx-auto p-6">
-        {/** 各セクションを <section id="xxx"> でラップする **/}
-        {/** === Profile セクション === **/}
-        <section id="sectionProfile">
-        <section>
-          <h2>Ryunosuke SUZUKI/鈴木龍之介</h2>
-          <p>{profile.affiliation}</p>
-            {profile.positions.map((pos, i) => (
-              <li key={i}>
-                {pos.from} - {pos.to ?? '現在'}: {pos.title}, {pos.institution}
-              </li>
-            ))}
-          <p>
-            Email:{' '}
-            <a href={`mailto:${profile.contact.email}`}>{profile.contact.email}</a>
-          </p>
-          <p>Research: {profile.research_fields.join(', ')}</p>
-          <p>
-            Links:{' '}
-            <a
-              href={profile.links.orcid}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              ORCID
-            </a>
-            ,{' '}
-            <a
-              href={profile.links.researchgate}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              ResearchGate
-            </a>
-            ,{' '}
-            <a
-              href={profile.links.lab_introduction}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Lab
-            </a>
-          </p>
-        </section>
-        </section>
-         {/** === Education セクション === **/}
-         <section id="sectionEducation">
-        <section>
-          <h2>経歴</h2>
-            {education.map((edu, i) => (
-              <li key={i}>
-                {edu.at}: {edu.institution} ({edu.degree})
-              </li>
-            ))}
-        </section>
-        </section>
-        {/** === Grants & Fellowships セクション === **/}
-         <section id="sectionGrants">
-        <section>
-          <h2>Grants & Fellowships</h2>
-          <ol>
-            {grants_and_fellowships.map((g, i) => (
-              <li key={i}>
-                {g.at ?? `${g.from} - ${g.to}`}: {g.title} ({g.amount})
-              </li>
-            ))}
-          </ol>
-        </section>
-        </section>
-
-        {/** === Publications セクション === **/}
-         <section id="sectionPublications">
-          <section>
-          <h2>論文</h2>
-          <ol>
-            {publications.map((pub, i) => (
-              <li key={i}>
-                {pub.authors.map((name: string, idx: number) => {
-                  const isSuzuki = name === "Ryunosuke Suzuki";
-
-                  return (
-                    <span key={idx}>
-                      {isSuzuki ? (
-                        <span style={{ textDecoration: "underline" }}>{name}</span>
-                      ) : (
-                        <span>{name}</span>
-                      )}
-                      {idx < pub.authors.length - 1 && "，"}
-                    </span>
-                  );
-                })}
-                , &quot;{pub.title},&quot; <em>{pub.venue}</em>
-                {pub.identifier ? `, ${pub.identifier}` : ''}
-                {pub.volume ? `, ${pub.volume}` : ''}
-                {pub.page ? `, ${pub.page}` : ''} ({pub.year}).
-                {pub.doi && (
-                  <span>
-                    {' '}
-                    DOI:{' '}
-                    <a
-                      href={`https://doi.org/${pub.doi}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {pub.doi}
-                    </a>
-                  </span>
-                )}
-              </li>
-            ))}
-          </ol>
-        </section>
-        </section>
-
-        {/** === International Conference Presentations セクション === **/}
-         <section id="sectionIntlConfs">
-         <section>
-          <h2>国際学会</h2>
-          <ol>
-            {international_conference_presentations.map((conf, i) => (
-              <li key={i}>
-                {conf.at}:{" "}
-                {conf.authors.map((name: string, idx: number) => {
-                  const isSuzuki = name === "Ryunosuke Suzuki";
-
-                  return (
-                    <span key={idx}>
-                      {isSuzuki ? (
-                        <span style={{ textDecoration: "underline" }}>{name}</span>
-                      ) : (
-                        <span>{name}</span>
-                      )}
-                      {idx < conf.authors.length - 1 && "，"}
-                    </span>
-                  );
-                })}
-                , &quot;{conf.title},&quot; <em>{conf.conference}</em> ({conf.location})
-              </li>
-            ))}
-          </ol>
-        </section>
-        </section>
-
-        {/** === Domestic Invited Lectures セクション === **/}
-         <section id="sectionInvited">
-        <section>
-          <h2>招待講演（国内）</h2>
-          <ol>
-            {domestic_invited_lectures.map((lec, i) => (
-              <li key={i}>
-                {lec.at}：
-                {lec.authors.map((name: string, idx: number) => {
-                  const isSuzuki = name === "鈴木龍之介";
-                  return (
-                    <span key={idx}>
-                      {isSuzuki ? (
-                        <span style={{ textDecoration: "underline" }}>{name}</span>
-                      ) : (
-                        <span>{name}</span>
-                      )}
-                      {idx < lec.authors.length - 1 && "，"}
-                    </span>
-                  );
-                })}
-                ，&quot;{lec.title}，&quot; {lec.event} ({lec.location})
-              </li>
-            ))}
-          </ol>
-        </section>
-        </section>
-
-        {/** === Domestic Presentations セクション === **/}
-         <section id="sectionDomPres">
-        <section>
-          <h2>学会等国内での発表</h2>
-          <ol>
-            {domestic_presentations.map((pres, i) => (
-              <li key={i}>
-                {pres.at}：
-                {pres.authors.map((name: string, idx: number) => {
-                  const isSuzuki = name === "鈴木龍之介";
-
-                  return (
-                    <span key={idx}>
-                      {isSuzuki ? (
-                        <span style={{ textDecoration: "underline" }}>{name}</span>
-                      ) : (
-                        <span>{name}</span>
-                      )}
-                      {idx < pres.authors.length - 1 && "，"}
-                    </span>
-                  );
-                })}
-                ，&quot;{pres.title}，&quot;{pres.event} ({pres.location})
-              </li>
-            ))}
-          </ol>
-        </section>
-        </section>
-
-        {/** === Other Activities セクション === **/}
-        <section id="sectionOther">
-        <section>
-          <h2>Other Activities</h2>
-          {other_activities.map((act, i) => (
-            <div key={i} className="mb-4">
-              <h3>{act.category}</h3>
-              {'details' in act ? (
-                <ol>
-                  {act.details.map((d: any) => (
-                    <li key={i}>
-                      {d.from} - {d.to ?? '現在'}：{d.partner} ({d.country})
-                    </li>
-                  ))}
-                </ol>
-              ) : (
-                <ol>
-                    <li key={i}>
-                      {act.at}：{act.event ?? act.conference}
-                    </li>
-                </ol>
-              )}
-            </div>
-          ))}
-        </section>
-        </section>
-      </main>
-  );
+  const { profile } = cv;
+  return <>
+    <a className="skip-link" href="#main">本文へスキップ</a>
+    <header className="site-header"><div className="header-inner">
+      <a className="wordmark" href="#sectionProfile" aria-label="Ryunosuke Suzuki — ページの先頭へ"><span className="monogram">rs.</span><span>RYUNOSUKE SUZUKI</span></a>
+      <nav aria-label="メインナビゲーション"><a href="#sectionResearch">研究</a><a href="#sectionPublications">論文</a><a href="#sectionEducation">経歴</a><a href="#sectionPresentations">発表</a><a className="nav-contact" href="#sectionContact">Contact <Arrow diagonal /></a></nav>
+    </div></header>
+    <main id="main" className="page-shell">
+      <section id="sectionProfile" className="hero" aria-labelledby="profile-name">
+        <div className="hero-copy"><p className="eyebrow"><span className="small-rule" /> KYOTO UNIVERSITY · RESEARCH PROFILE</p>
+          <h1 id="profile-name" lang="en">Ryunosuke<br /><em>Suzuki.</em></h1><p className="name-japanese">{profile.name}</p>
+          <p className="hero-affiliation"><span>{profile.affiliation.split(" ").slice(0, 2).join(" ")}</span><span>{profile.affiliation.split(" ").slice(2).join(" ")}</span></p>
+          <div className="hero-links"><a className="primary-link" href="#sectionPublications">論文を見る <Arrow /></a><a className="text-link" href={`mailto:${profile.contact.email}`}>お問い合わせ <Arrow diagonal /></a></div>
+        </div><ResearchFigure />
+      </section>
+      <section id="sectionResearch" className="research-intro section-layout" aria-labelledby="research-heading">
+        <SectionHeading number="01" title="Research" subtitle="研究について" id="research-heading" />
+        <div className="section-content"><h3 className="research-statement">形と力から、<br className="mobile-break" />生命を考える。</h3>
+          <p className="research-description">生体の形態変化と力学的な適応、その背後にある相互作用を数理モデルから探究しています。バイオメカニクスと生物物理学を軸に、生命システムの理解に取り組んでいます。</p>
+          <ul className="research-fields" aria-label="研究分野">{profile.research_fields.map((field) => <li key={field}>{field}</li>)}</ul>
+          <div className="profile-links"><ExternalLink href={profile.links.orcid}>ORCID</ExternalLink><ExternalLink href={profile.links.researchgate}>ResearchGate</ExternalLink><ExternalLink href={profile.links.lab_introduction}>研究室</ExternalLink></div>
+        </div>
+      </section>
+      <section id="sectionPublications" className="section-layout" aria-labelledby="publications-heading">
+        <SectionHeading number="02" title="Publications" subtitle="論文" id="publications-heading" />
+        <div className="section-content"><ol className="publication-list">{cv.publications.map((pub, i) => <li key={pub.title}>
+          <div className="publication-meta"><span>{String(i + 1).padStart(2, "0")} / {pub.year}</span><span>{pub.venue === "arXiv preprint" ? "PREPRINT" : "JOURNAL ARTICLE"}</span></div>
+          <h3><ExternalLink href={`https://doi.org/${pub.doi}`} className="publication-title">{pub.title}</ExternalLink></h3>
+          <Authors names={pub.authors} /><p className="publication-venue"><em>{pub.venue}</em>{pub.identifier && `, ${pub.identifier}`}{pub.volume && `, ${pub.volume}`}{pub.page && `, ${pub.page}`} ({pub.year})</p>
+          <ExternalLink href={`https://doi.org/${pub.doi}`} className="doi-link">DOI: {pub.doi}</ExternalLink>
+        </li>)}</ol></div>
+      </section>
+      <section id="sectionEducation" className="section-layout" aria-labelledby="education-heading">
+        <SectionHeading number="03" title="Background" subtitle="経歴・学歴" id="education-heading" />
+        <div className="section-content"><h3 className="subsection-title">所属・職歴 <span>Appointments</span></h3>
+          <ol className="record-list">{profile.positions.map((position) => <li key={position.title}>
+            <div className="record-date"><DateLabel value={position.from} /><span>— {position.to ? <DateLabel value={position.to} /> : "現在"}</span></div>
+            <div className="record-body"><h4>{position.title}</h4><p>{position.institution}</p></div>
+          </li>)}</ol>
+          <h3 className="subsection-title spaced">学歴 <span>Education</span></h3>
+          <ol className="record-list">{[...cv.education].reverse().map((education) => <li key={education.at}>
+            <div className="record-date"><DateLabel value={education.at} /></div><div className="record-body"><h4>{education.institution}</h4><p>{education.degree}</p></div>
+          </li>)}</ol>
+        </div>
+      </section>
+      <section id="sectionGrants" className="section-layout" aria-labelledby="grants-heading">
+        <SectionHeading number="04" title="Grants" subtitle="研究助成・フェローシップ" id="grants-heading" />
+        <div className="section-content"><ol className="record-list">{cv.grants_and_fellowships.map((grant) => <li key={grant.title}>
+          <div className="record-date">{grant.at ? <DateLabel value={grant.at} /> : <><DateLabel value={grant.from!} /><span>— <DateLabel value={grant.to!} /></span></>}</div>
+          <div className="record-body"><h3>{grant.title}</h3><p className="grant-amount">{grant.amount}</p></div>
+        </li>)}</ol></div>
+      </section>
+      <section id="sectionPresentations" className="section-layout" aria-labelledby="presentations-heading">
+        <SectionHeading number="05" title="Presentations" subtitle="学会発表・招待講演" id="presentations-heading" />
+        <div className="section-content">
+          <section id="sectionIntlConfs" aria-labelledby="international-heading"><h3 className="subsection-title" id="international-heading">国際学会 <span>International</span></h3><PresentationList items={cv.international_conference_presentations} /></section>
+          <section id="sectionInvited" className="spaced" aria-labelledby="invited-heading"><h3 className="subsection-title" id="invited-heading">招待講演 <span>Invited talks</span></h3><PresentationList items={cv.domestic_invited_lectures} /></section>
+          <section id="sectionDomPres" className="spaced" aria-labelledby="domestic-heading"><h3 className="subsection-title" id="domestic-heading">国内発表 <span>Domestic</span></h3><PresentationList items={cv.domestic_presentations.slice(0, 3)} />
+            <details className="archive"><summary>これまでの発表を見る <span>{cv.domestic_presentations.length - 3}件 <span className="disclosure-icon" aria-hidden="true">＋</span></span></summary><PresentationList items={cv.domestic_presentations.slice(3)} /></details>
+          </section>
+        </div>
+      </section>
+      <section id="sectionOther" className="section-layout" aria-labelledby="activities-heading">
+        <SectionHeading number="06" title="Activities" subtitle="共同研究・その他の活動" id="activities-heading" />
+        <div className="section-content"><ul className="activity-list">{cv.other_activities.map((activity) => <li key={activity.category}><h3>{activity.category}</h3>
+          {activity.details ? activity.details.map((detail) => <div key={detail.partner}><p>{detail.partner} · {detail.country}</p><p className="record-note"><DateLabel value={detail.from} /> — {detail.to ?? "現在"}</p></div>) : <><p>{activity.event ?? activity.conference}</p><p className="record-note"><DateLabel value={activity.at!} /></p></>}
+        </li>)}</ul></div>
+      </section>
+      <section id="sectionContact" className="contact-section" aria-labelledby="contact-heading"><div><p className="eyebrow">GET IN TOUCH</p><h2 id="contact-heading">Contact<span>.</span></h2><p>研究に関するご連絡はこちらへ。</p></div><a className="contact-email" href={`mailto:${profile.contact.email}`}>{profile.contact.email}<Arrow diagonal /></a></section>
+    </main>
+    <footer className="site-footer page-shell"><span>© {profile.name_roman}</span><span>Biomechanics &amp; Biophysics</span><a href="#sectionProfile">ページの先頭へ <span aria-hidden="true">↑</span></a></footer>
+  </>;
 }
-
-
-  //      {/** ──────────────── ① ナビゲーション部分 ──────────────── **/}
-  //      <nav
-  //        className="
-  //          fixed top-0 left-0 w-full bg-white shadow 
-  //          z-20
-  //        "
-  //      >
-  //        <ol>
-  //          <li>
-  //            <Link
-  //              to="sectionProfile"
-  //              spy={true}
-  //              smooth={true}
-  //              offset={-64}
-  //              duration={400}
-  //              activeClass="active"
-  //              className="cursor-pointer hover:underline"
-  //            >
-  //              Profile
-  //            </Link>
-  //          </li>
-  //          <li>
-  //            <Link
-  //              to="sectionEducation"
-  //              spy={true}
-  //              smooth={true}
-  //              offset={-64}
-  //              duration={400}
-  //              activeClass="active"
-  //              className="cursor-pointer hover:underline"
-  //            >
-  //              経歴
-  //            </Link>
-  //          </li>
-  //          <li>
-  //            <Link
-  //              to="sectionGrants"
-  //              spy={true}
-  //              smooth={true}
-  //              offset={-64}
-  //              duration={400}
-  //              activeClass="active"
-  //              className="cursor-pointer hover:underline"
-  //            >
-  //              Grants & Fellowships
-  //            </Link>
-  //          </li>
-  //          <li>
-  //            <Link
-  //              to="sectionPublications"
-  //              spy={true}
-  //              smooth={true}
-  //              offset={-64}
-  //              duration={400}
-  //              activeClass="active"
-  //              className="cursor-pointer hover:underline"
-  //            >
-  //              論文
-  //            </Link>
-  //          </li>
-  //          <li>
-  //            <Link
-  //              to="sectionIntlConfs"
-  //              spy={true}
-  //              smooth={true}
-  //              offset={-64}
-  //              duration={400}
-  //              activeClass="active"
-  //              className="cursor-pointer hover:underline"
-  //            >
-  //              国際学会
-  //            </Link>
-  //          </li>
-  //          <li>
-  //            <Link
-  //              to="sectionInvited"
-  //              spy={true}
-  //              smooth={true}
-  //              offset={-64}
-  //              duration={400}
-  //              activeClass="active"
-  //              className="cursor-pointer hover:underline"
-  //            >
-  //              招待講演（国内）
-  //            </Link>
-  //          </li>
-  //          <li>
-  //            <Link
-  //              to="sectionDomPres"
-  //              spy={true}
-  //              smooth={true}
-  //              offset={-64}
-  //              duration={400}
-  //              activeClass="active"
-  //              className="cursor-pointer hover:underline"
-  //            >
-  //              国内発表
-  //            </Link>
-  //          </li>
-  //          <li>
-  //            <Link
-  //              to="sectionOther"
-  //              spy={true}
-  //              smooth={true}
-  //              offset={-64}
-  //              duration={400}
-  //              activeClass="active"
-  //              className="cursor-pointer hover:underline"
-  //            >
-  //              Other Activities
-  //            </Link>
-  //          </li>
-  //        </ol>
-  //      </nav>
-
-  //      {/** ─── 固定ヘッダーの高さぶんだけ余白を確保 ─── **/}
-  //      <div style={{ height: "64px" }} />
-
-       {/** ──────────────── メインコンテンツ ──────────────── **/}
